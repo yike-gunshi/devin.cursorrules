@@ -1,12 +1,14 @@
-#!/usr/bin/env /workspace/tmp_windsurf/py310/bin/python3
+#!/usr/bin/env python3
 
 import argparse
 import sys
+import traceback
 from duckduckgo_search import DDGS
 
-def search(query, max_results=5):
+def search(query, max_results=10):
     """
     Search using DuckDuckGo and return results with URLs and text snippets.
+    Uses the HTML backend which has proven to be more reliable.
     
     Args:
         query (str): Search query
@@ -14,30 +16,37 @@ def search(query, max_results=5):
     """
     try:
         print(f"DEBUG: Searching for query: {query}", file=sys.stderr)
+        
         with DDGS() as ddgs:
-            results = list(ddgs.text(query, max_results=max_results))
+            results = list(ddgs.text(
+                query,
+                max_results=max_results,
+                backend='html'  # Use only the HTML backend
+            ))
             
-        if not results:
-            print("DEBUG: No results found", file=sys.stderr)
-            return
-        
-        print(f"DEBUG: Found {len(results)} results", file=sys.stderr)
-        
-        for i, r in enumerate(results, 1):
-            print(f"\n=== Result {i} ===")
-            print(f"URL: {r.get('href', 'N/A')}")
-            print(f"Title: {r.get('title', 'N/A')}")
-            print(f"Snippet: {r.get('body', 'N/A')}")
+            if not results:
+                print("DEBUG: No results found", file=sys.stderr)
+                return
             
+            print(f"DEBUG: Found {len(results)} results", file=sys.stderr)
+            
+            for i, r in enumerate(results, 1):
+                print(f"\n=== Result {i} ===")
+                print(f"URL: {r.get('link', r.get('href', 'N/A'))}")
+                print(f"Title: {r.get('title', 'N/A')}")
+                print(f"Snippet: {r.get('snippet', r.get('body', 'N/A'))}")
+                
     except Exception as e:
-        print(f"ERROR: An error occurred: {str(e)}", file=sys.stderr)
+        print(f"ERROR: Search failed: {str(e)}", file=sys.stderr)
+        print(f"ERROR type: {type(e)}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
 def main():
     parser = argparse.ArgumentParser(description="Search using DuckDuckGo API")
     parser.add_argument("query", help="Search query")
-    parser.add_argument("--max-results", type=int, default=5,
-                      help="Maximum number of results (default: 5)")
+    parser.add_argument("--max-results", type=int, default=10,
+                      help="Maximum number of results (default: 10)")
     
     args = parser.parse_args()
     search(args.query, args.max_results)
