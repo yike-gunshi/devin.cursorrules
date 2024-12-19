@@ -14,12 +14,20 @@ Transform your $20 Cursor/Windsurf into a Devin-like experience in one minute! T
 
 ## Setup
 
-1. Install dependencies:
+1. Create Python virtual environment:
 ```bash
-# Create a virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Create a virtual environment in ./py310
+python3 -m venv py310
 
+# Activate the virtual environment
+# On Unix/macOS:
+source py310/bin/activate
+# On Windows:
+.\py310\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
 # Install required packages
 pip install -r requirements.txt
 
@@ -40,7 +48,7 @@ The project includes comprehensive unit tests for all tools. To run the tests:
 
 ```bash
 # Make sure you're in the virtual environment
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source py310/bin/activate  # On Windows: .\py310\Scripts\activate
 
 # Run all tests
 PYTHONPATH=. python -m unittest discover tests/
