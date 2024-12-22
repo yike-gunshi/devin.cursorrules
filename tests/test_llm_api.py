@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import os
 from tools.llm_api import create_llm_client, query_llm
 
 class TestLLMAPI(unittest.TestCase):
@@ -22,15 +23,28 @@ class TestLLMAPI(unittest.TestCase):
     def test_create_llm_client(self, mock_openai):
         # Test client creation
         mock_openai.return_value = self.mock_client
-        client = create_llm_client()
         
-        # Verify OpenAI was called with correct parameters
-        mock_openai.assert_called_once_with(
-            base_url="http://192.168.180.137:8006/v1",
-            api_key="not-needed"
-        )
+        # Store original env var
+        original_api_key = os.environ.get('OPENAI_API_KEY')
         
-        self.assertEqual(client, self.mock_client)
+        try:
+            # Set test API key
+            os.environ['OPENAI_API_KEY'] = 'test-api-key'
+            
+            client = create_llm_client()
+            
+            # Verify OpenAI was called with correct parameters
+            mock_openai.assert_called_once_with(
+                api_key='test-api-key'
+            )
+            
+            self.assertEqual(client, self.mock_client)
+        finally:
+            # Restore original env var
+            if original_api_key:
+                os.environ['OPENAI_API_KEY'] = original_api_key
+            else:
+                del os.environ['OPENAI_API_KEY']
 
     @patch('tools.llm_api.create_llm_client')
     def test_query_llm_success(self, mock_create_client):
@@ -45,7 +59,7 @@ class TestLLMAPI(unittest.TestCase):
         
         # Verify client was called correctly
         self.mock_client.chat.completions.create.assert_called_once_with(
-            model="Qwen/Qwen2.5-32B-Instruct-AWQ",
+            model="gpt-4o",
             messages=[{"role": "user", "content": "Test prompt"}],
             temperature=0.7
         )

@@ -1,20 +1,27 @@
-#!/usr/bin/env /workspace/tmp_windsurf/py310/bin/python3
+#!/usr/bin/env python3
 
 from openai import OpenAI
 import argparse
+import sys
+import os
 
 def create_llm_client():
-    client = OpenAI(
-        base_url="http://192.168.180.137:8006/v1",
-        api_key="not-needed"  # API key might not be needed for local deployment
-    )
+    api_key = os.getenv('OPENAI_API_KEY')
+    if not api_key:
+        raise ValueError(
+            "OPENAI_API_KEY environment variable is not set. "
+            "Please set it in your .env file or export it in your shell."
+        )
+    
+    client = OpenAI(api_key=api_key)
     return client
 
-def query_llm(prompt, client=None, model="Qwen/Qwen2.5-32B-Instruct-AWQ"):
+def query_llm(prompt, client=None, model="gpt-4o"):
     if client is None:
         client = create_llm_client()
     
     try:
+        print(f"Using model: {model}", file=sys.stderr)
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -30,8 +37,8 @@ def query_llm(prompt, client=None, model="Qwen/Qwen2.5-32B-Instruct-AWQ"):
 def main():
     parser = argparse.ArgumentParser(description='Query an LLM with a prompt')
     parser.add_argument('--prompt', type=str, help='The prompt to send to the LLM', required=True)
-    parser.add_argument('--model', type=str, default="Qwen/Qwen2.5-32B-Instruct-AWQ",
-                       help='The model to use (default: Qwen/Qwen2.5-32B-Instruct-AWQ)')
+    parser.add_argument('--model', type=str, default="gpt-4o",
+                       help='The model to use (default: gpt-4o)')
     args = parser.parse_args()
 
     client = create_llm_client()

@@ -1,0 +1,28 @@
+services:
+  # 基础服务 - 用于运行LLM API等基础功能
+  base:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python -m tools.llm_api --prompt "Hello, this is a test message"
+
+  # 爬虫服务 - 包含浏览器依赖
+  scraper:
+    build: 
+      context: .
+      dockerfile: Dockerfile.scraper
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python -m tools.web_scraper
