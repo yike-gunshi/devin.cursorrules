@@ -1,4 +1,21 @@
 services:
+  # 开发服务 - 用于VS Code开发环境
+  dev:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: /bin/bash
+    tty: true
+    ports:
+      - "8000:8000"
+
   # 基础服务 - 用于运行LLM API等基础功能
   base:
     build: 
@@ -25,4 +42,5 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: python -m tools.web_scraper
+    command: tail -f /dev/null
+    tty: true

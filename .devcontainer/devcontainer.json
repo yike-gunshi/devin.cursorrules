@@ -1,16 +1,19 @@
 {
-    "name": "temp",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": {
-            "version": "3.10"
-        }
-    },
+    "name": "devin.cursorrules",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "dev",
+    "workspaceFolder": "/app",
     "customizations": {
         "vscode": {
-            "extensions": []
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker"
+            ]
         }
     },
-    "forwardPorts": [8080],
-    "postCreateCommand": "apt-get update"
+    "forwardPorts": [8000],
+    "remoteUser": "appuser",
+    "postCreateCommand": "pip install -r requirements.txt",
+    "overrideCommand": false
 }
