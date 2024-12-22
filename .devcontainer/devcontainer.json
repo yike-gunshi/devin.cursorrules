@@ -1,5 +1,5 @@
 {
-    "name": "devin.cursorrules",
+    "name": "Python Dev Container",
     "dockerComposeFile": "../docker-compose.yml",
     "service": "dev",
     "workspaceFolder": "/app",
@@ -7,13 +7,9 @@
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.vscode-pylance",
-                "ms-azuretools.vscode-docker"
+                "ms-python.vscode-pylance"
             ]
         }
     },
-    "forwardPorts": [8000],
-    "remoteUser": "appuser",
-    "postCreateCommand": "pip install -r requirements.txt",
-    "overrideCommand": false
+    "remoteUser": "appuser"
 }

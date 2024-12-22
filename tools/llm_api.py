@@ -1,35 +1,24 @@
 #!/usr/bin/env python3
 
-from openai import OpenAI
+import google.generativeai as genai
 import argparse
 import sys
 import os
 
 def create_llm_client():
-    api_key = os.getenv('OPENAI_API_KEY')
-    if not api_key:
-        raise ValueError(
-            "OPENAI_API_KEY environment variable is not set. "
-            "Please set it in your .env file or export it in your shell."
-        )
-    
-    client = OpenAI(api_key=api_key)
-    return client
+    api_key = 'AIzaSyB31Okz3O878obIYvKM1ssKkFATI1r9-eo'
+    genai.configure(api_key=api_key)
+    return genai
 
-def query_llm(prompt, client=None, model="gpt-4o"):
+def query_llm(prompt, client=None, model="gemini-pro"):
     if client is None:
         client = create_llm_client()
     
     try:
         print(f"Using model: {model}", file=sys.stderr)
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-        )
-        return response.choices[0].message.content
+        model = client.GenerativeModel(model)
+        response = model.generate_content(prompt)
+        return response.text
     except Exception as e:
         print(f"Error querying LLM: {e}")
         return None
@@ -37,8 +26,8 @@ def query_llm(prompt, client=None, model="gpt-4o"):
 def main():
     parser = argparse.ArgumentParser(description='Query an LLM with a prompt')
     parser.add_argument('--prompt', type=str, help='The prompt to send to the LLM', required=True)
-    parser.add_argument('--model', type=str, default="gpt-4o",
-                       help='The model to use (default: gpt-4o)')
+    parser.add_argument('--model', type=str, default="gemini-pro",
+                       help='The model to use (default: gemini-pro)')
     args = parser.parse_args()
 
     client = create_llm_client()
